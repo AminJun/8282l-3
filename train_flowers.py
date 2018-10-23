@@ -70,21 +70,19 @@ class VGG(nn.Module):
         return nn.Sequential(*layers)
 
 
-SHAPE = (28, 28, 1)
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
 EPOCHS = 12
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Flowers'
-_mean = 0
-std = 1
 
 
 def load_data():
-    x = np.load(DATA_SET + '/flower_imgs.npy').astype(np.float32)/ 255.
+    x = np.load(DATA_SET + '/flower_imgs.npy').astype(np.float32) / 255.
     y = np.load(DATA_SET + '/flower_labels.npy').astype(np.float32)
-    channeled = np.rollaxis(x, 3).reshape((3, -1))
+    x = np.rollaxis(x, 3, 1)
+    channeled = np.rollaxis(x, 1).reshape((3, -1))
     return train_test_split(x, y, test_size=0.15), channeled.mean(1), channeled.std(1)
 
 
@@ -128,6 +126,7 @@ if __name__ == '__main__':
     data, mean, std = load_data()
     x_train, x_test, y_train, y_test = data
     import pdb
+
     pdb.set_trace()
     train_loader = DataLoader(TrainLoader(x_train, y_train, mean, std), batch_size=BATCH_SIZE,
                               shuffle=True)
