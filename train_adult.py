@@ -122,7 +122,7 @@ if __name__ == '__main__':
     net = Net()
     net = net.to(device)
     if device == 'cuda':
-        net = net.cuda()
+        # net = net.cuda()
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
     # print(device)
