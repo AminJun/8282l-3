@@ -125,9 +125,6 @@ def test(my_net, my_criterion, my_loader, my_device):
 if __name__ == '__main__':
     data, mean, std = load_data()
     x_train, x_test, y_train, y_test = data
-    import pdb
-
-    pdb.set_trace()
     train_loader = DataLoader(TrainLoader(x_train, y_train, mean, std), batch_size=BATCH_SIZE,
                               shuffle=True)
     test_loader = DataLoader(TestLoader(x_test, y_test, mean, std), batch_size=BATCH_SIZE,
