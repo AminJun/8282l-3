@@ -28,10 +28,10 @@ def load_data():
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(67, 80)
+        self.fc1 = nn.Linear(67, 100)
         self.relu1 = nn.ReLU()
         self.dout = nn.Dropout(0.2)
-        self.fc2 = nn.Linear(80, 100)
+        # self.fc2 = nn.Linear(80, 100)
         self.prelu = nn.PReLU(1)
         self.out = nn.Linear(100, 1)
         self.out_act = nn.Sigmoid()
