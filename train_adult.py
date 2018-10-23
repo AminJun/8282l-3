@@ -42,7 +42,7 @@ class Net(nn.Module):
         x = self.fc1(x)
         x = self.relu1(x)
         # x = self.dout(x)
-        x = self.fc2(x)
+        # x = self.fc2(x)
         x = self.prelu(x)
         x = self.out(x)
         x = self.out_act(x)
