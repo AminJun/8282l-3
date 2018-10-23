@@ -91,7 +91,7 @@ def test(my_net, my_criterion, my_loader, my_device):
             test_loss += loss.item()
             _, predicted = outputs.max(1)
             total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
+            correct += predicted.float().eq(targets).sum().item()
     print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * correct / total))
 
 
