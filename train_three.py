@@ -33,15 +33,15 @@ class AutoEncoder(nn.Module):
     def __init__(self):
         super(AutoEncoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(33, 30), nn.ReLU(True),
-            nn.Linear(30, 24), nn.ReLU(True),
-            nn.Linear(24, 18), nn.ReLU(True),
-            nn.Linear(18, 16))
+            nn.Linear(33, 28), nn.ReLU(True),
+            # nn.Linear(30, 24), nn.ReLU(True),
+            nn.Linear(28, 20), nn.ReLU(True),
+            nn.Linear(20, 16))
         self.decoder = nn.Sequential(
-            nn.Linear(16, 18), nn.ReLU(True),
-            nn.Linear(18, 24), nn.ReLU(True),
-            nn.Linear(24, 30), nn.ReLU(True),
-            nn.Linear(30, 33), nn.Tanh())
+            nn.Linear(16, 20), nn.ReLU(True),
+            nn.Linear(20, 28), nn.ReLU(True),
+            # nn.Linear(24, 30), nn.ReLU(True),
+            nn.Linear(28, 33), nn.Tanh())
 
     def forward(self, x):
         return self.decoder(self.encoder(x))
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     criterion = nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     lambda1 = lambda \
-            epoch: lr if epoch < EPOCHS / 3 else lr * 0.3 if epoch < 2 * EPOCHS / 3 else lr * 0.01
+            epoch: lr if epoch < EPOCHS / 2 else lr * 0.3 if epoch < EPOCHS / 4 else lr * 0.01
     scheduler = LambdaLR(optimizer, [lambda1])
     for epoch in range(EPOCHS):
         for data in data_loader:
