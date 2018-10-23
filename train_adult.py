@@ -11,8 +11,8 @@ from torchvision import transforms
 from sklearn.preprocessing import MinMaxScaler
 
 LOUD = False
-BATCH_SIZE = 128  # Must be in range (16, 100)
-EPOCHS = 200
+BATCH_SIZE = 28  # Must be in range (16, 100)
+EPOCHS = 100
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
