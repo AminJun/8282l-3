@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms
+# from torchvision import transforms
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
@@ -47,13 +47,13 @@ class ThreeLoader(Dataset):
     def __init__(self, x_arr, y_arr):
         self.x_arr = x_arr
         self.y_arr = y_arr
-        self.transform =transforms.Compose(transforms.ToTensor())
+        # self.transform =transforms.Compose(transforms.ToTensor())
 
     def __len__(self):
         return self.x_arr.shape[0]
 
     def __getitem__(self, index):
-        return self.transform(self.x_arr[index]), self.y_arr[index]
+        return self.x_arr[index], self.y_arr[index]
 
 
 def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
@@ -106,5 +106,5 @@ if __name__ == '__main__':
     criterion = nn.BCELoss()
     # e_losses = []
     for _ in range(EPOCHS):
-        train(net, opt, criterion, train_loader)
+        train(net, opt, criterion, train_loader, device)
         test(net, criterion, test_loader, device)
