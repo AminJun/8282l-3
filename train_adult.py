@@ -61,6 +61,23 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
     print('Loss: %.3f | ACC: %.3f' % (train_loss, 100. * correct / total))
 
 
+def test(my_net, my_criterion, my_loader, my_device):
+    my_net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in enumerate(my_loader):
+            inputs, targets = inputs.to(my_device), targets.to(my_device)
+            outputs = my_net(inputs)
+            loss = my_criterion(outputs, targets)
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+    print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * correct / total))
+
+
 class ThreeLoader(Dataset):
     def __init__(self, x_arr, y_arr):
         self.x_arr = x_arr
@@ -76,6 +93,7 @@ class ThreeLoader(Dataset):
 if __name__ == '__main__':
     x_train, x_test, y_train, y_test = load_data()
     train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
+    test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     net = Net()
     net = net.to(device)
@@ -87,5 +105,7 @@ if __name__ == '__main__':
     # e_losses = []
     for _ in range(EPOCHS):
         train(net, opt, criterion, train_loader)
+        test(net, criterion, test_loader, device)
     import pdb
+
     pdb.set_trace()
