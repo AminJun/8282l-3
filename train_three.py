@@ -20,7 +20,6 @@ lr = 1e-1
 class ThreeLoader(Dataset):
     def __init__(self, x_arr):
         self.x_arr = x_arr
-        self.transform = transforms.Compose(transforms.ToTensor())
 
     def __len__(self):
         return self.x_arr.shape[0]
@@ -32,7 +31,7 @@ class ThreeLoader(Dataset):
 class AutoEncoder(nn.Module):
     def __init__(self):
         super(AutoEncoder, self).__init__()
-        _mid = 16
+        _mid = 14
         _in = 33
         _l2 = int((_mid + _in) / 2)
         _l3 = int((_mid + _l2) / 2)
