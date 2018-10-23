@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from torch import nn
 from torch.autograd import Variable
+from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
@@ -13,7 +14,7 @@ EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
-learning_rate = 1e-3
+lr = 1e-3
 
 
 class ThreeLoader(Dataset):
@@ -55,7 +56,10 @@ if __name__ == '__main__':
     data_loader = DataLoader(ThreeLoader(train_data), batch_size=BATCH_SIZE, shuffle=True)
     model = AutoEncoder().cuda()
     criterion = nn.L1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
+    lambda1 = lambda \
+            epoch: lr if epoch < EPOCHS / 2 else lr * 0.1 if epoch < EPOCHS / 4 else lr * 0.001
+    scheduler = LambdaLR(optimizer, [lambda1])
     for epoch in range(EPOCHS):
         for data in data_loader:
             img, _ = data
@@ -68,5 +72,6 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            scheduler.step(epoch)
             # ===================log========================
             print('epoch [{}/{}], loss:{:.4f}'.format(epoch + 1, EPOCHS, loss.data[0]))
