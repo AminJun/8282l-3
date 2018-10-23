@@ -5,7 +5,7 @@
 * Classify the flowers shown in the flower dataset
   * The flowers are in color and you'll have to work with that. You can't turn them to greyscale etc.
 
-* Create the best autoencoder for the three meter dataset you can (best measured by MAE, more info in file), noting that the network must have at least one layer with less than half the number of datapoints rounded down
+* Create the best AutoEncoder for the three meter dataset you can (best measured by MAE, more info in file), noting that the network must have at least one layer with less than half the number of datapoints rounded down
   * Reasonable hyperparameters are all that is needed, please describe the optimization process in your writeup and do not make the hyperparameter search run by default
   * More instructions in readme in dataset folder
 
