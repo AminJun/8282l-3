@@ -14,7 +14,7 @@ EPOCHS = 12
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
-lr = 1e-1
+lr = 2e-1
 
 
 class ThreeLoader(Dataset):
@@ -35,11 +35,13 @@ class AutoEncoder(nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(33, 30), nn.ReLU(True),
             nn.Linear(30, 24), nn.ReLU(True),
-            nn.Linear(24, 18), nn.ReLU(True),
+            nn.Linear(24, 20), nn.ReLU(True),
+            nn.Linear(20, 18), nn.ReLU(True),
             nn.Linear(18, 16))
         self.decoder = nn.Sequential(
             nn.Linear(16, 18), nn.ReLU(True),
-            nn.Linear(18, 24), nn.ReLU(True),
+            nn.Linear(18, 20), nn.ReLU(True),
+            nn.Linear(20, 24), nn.ReLU(True),
             nn.Linear(24, 30), nn.ReLU(True),
             nn.Linear(30, 33), nn.Tanh())
 
