@@ -33,6 +33,8 @@ class Net(nn.Module):
         self.out_act = nn.Sigmoid()
 
     def forward(self, x):
+        print(x.device)
+        print(self.fc1.weight.device)
         x = self.fc1(x)
         x = self.relu1(x)
         x = self.dout(x)
