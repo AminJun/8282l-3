@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 200
-EPOCHS = 16
+EPOCHS = 30
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     criterion = nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     lambda1 = lambda \
-            epoch: lr if epoch < EPOCHS / 2 else lr * 0.5 if epoch < EPOCHS / 4 else lr * 0.1
+            epoch: lr if epoch < EPOCHS / 2 else lr * 0.5 if EPOCHS - epoch < EPOCHS / 4 else lr * 0.1
     scheduler = LambdaLR(optimizer, [lambda1])
     for epoch in range(EPOCHS):
         for data in data_loader:
