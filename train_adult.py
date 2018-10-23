@@ -110,7 +110,7 @@ if __name__ == '__main__':
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
     print(device)
-    opt = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
+    opt = optim.Adam(net.parameters(), lr=0.1, betas=(0.9, 0.999))
     criterion = nn.BCELoss()
     # e_losses = []
     for _ in range(EPOCHS):
