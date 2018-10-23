@@ -101,7 +101,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
-        print('Loss: %.3f | ACC: %.3f' % (train_loss, 100. * correct / total))
+    print('Loss: %.3f | ACC: %.3f' % (train_loss, 100. * correct / total))
 
 
 def test(my_net, my_criterion, my_loader, my_device):
@@ -118,7 +118,7 @@ def test(my_net, my_criterion, my_loader, my_device):
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
-            print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * correct / total))
+    print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * correct / total))
 
 
 if __name__ == '__main__':
