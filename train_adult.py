@@ -13,7 +13,7 @@ EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
-lr = 0.05
+lr = 50
 
 
 def load_data():
@@ -31,18 +31,18 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(67, 100)
         self.relu1 = nn.ReLU()
         self.dout = nn.Dropout(0.2)
-        # self.fc2 = nn.Linear(80, 100)
+        self.fc2 = nn.Linear(80, 100)
         self.prelu = nn.PReLU(1)
         self.out = nn.Linear(100, 1)
         self.out_act = nn.Sigmoid()
 
     def forward(self, x):
-        # print(x.device)
-        # print(self.fc1.weight.device)
+        print(x.device)
+        print(self.fc1.weight.device)
         x = self.fc1(x)
         x = self.relu1(x)
-        # x = self.dout(x)
-        # x = self.fc2(x)
+        x = self.dout(x)
+        x = self.fc2(x)
         x = self.prelu(x)
         x = self.out(x)
         x = self.out_act(x)
