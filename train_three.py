@@ -14,7 +14,7 @@ EPOCHS = 12
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
-lr = 2e-1
+lr = 1
 
 
 class ThreeLoader(Dataset):
