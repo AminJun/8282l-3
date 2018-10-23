@@ -9,12 +9,12 @@ from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
-BATCH_SIZE = 128  # Must be in range (16, 100)
+BATCH_SIZE = 200
 EPOCHS = 12
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
-lr = 2e-1
+lr = 1e-1
 
 
 class ThreeLoader(Dataset):
@@ -41,7 +41,7 @@ class AutoEncoder(nn.Module):
             nn.Linear(16, 18), nn.ReLU(True),
             nn.Linear(18, 24), nn.ReLU(True),
             nn.Linear(24, 30), nn.ReLU(True),
-            nn.Linear(30, 33))
+            nn.Linear(30, 33), nn.Tanh())
 
     def forward(self, x):
         return self.decoder(self.encoder(x))
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     criterion = nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     lambda1 = lambda \
-            epoch: lr if epoch < EPOCHS / 2 else lr * 0.1 if epoch < EPOCHS / 4 else lr * 0.001
+            epoch: lr if epoch < EPOCHS / 2 else lr * 0.3 if epoch < EPOCHS / 4 else lr * 0.01
     scheduler = LambdaLR(optimizer, [lambda1])
     for epoch in range(EPOCHS):
         for data in data_loader:
