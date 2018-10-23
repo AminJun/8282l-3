@@ -9,7 +9,7 @@ from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
-EPOCHS = 12
+EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
@@ -67,7 +67,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
         inputs, targets = inputs.to(my_device), targets.to(my_device)
 
         my_optimizer.zero_grad()
-        outputs = my_net(inputs.cuda())
+        outputs = my_net(inputs)
         loss = my_criterion(outputs, targets)
         loss.backward()
         my_optimizer.step()
@@ -89,6 +89,8 @@ def test(my_net, my_criterion, my_loader, my_device):
             outputs = my_net(inputs)
             loss = my_criterion(outputs, targets)
             test_loss += loss.item()
+            import pdb
+            pdb.set_trace()
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.float().eq(targets).sum().item()
@@ -109,8 +111,8 @@ if __name__ == '__main__':
         net = net.cuda()
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
-    print(device)
-    opt = optim.Adam(net.parameters(), lr=0.1, weight_decay=1e-5)
+    # print(device)
+    opt = optim.Adam(net.parameters(), lr=1, weight_decay=1e-5)
     criterion = nn.BCELoss()
     # e_losses = []
     for _ in range(EPOCHS):
