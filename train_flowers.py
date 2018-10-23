@@ -128,6 +128,8 @@ if __name__ == '__main__':
                               shuffle=True)
     test_loader = DataLoader(TestLoader(x_test, y_test, mean, std), batch_size=BATCH_SIZE,
                              shuffle=False)
+    y_train = torch.cuda.LongTensor(y_train)
+    y_test = torch.cuda.LongTensor(y_test)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     net = VGG()
