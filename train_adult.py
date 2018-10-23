@@ -64,7 +64,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
     correct = 0
     total = 0
     for batch_idx, (inputs, targets) in enumerate(my_loader):
-        inputs, targets = inputs.to(my_device), targets.to(my_device).float()
+        inputs, targets = inputs.to(my_device), targets.to(my_device)
 
         my_optimizer.zero_grad()
         outputs = my_net(inputs.cuda())
@@ -98,8 +98,8 @@ def test(my_net, my_criterion, my_loader, my_device):
 if __name__ == '__main__':
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
     x_train, x_test, y_train, y_test = load_data()
-    y_train = torch.cuda.LongTensor(y_train)
-    y_test = torch.cuda.LongTensor(y_test)
+    # y_train = torch.cuda.LongTensor(y_train)
+    # y_test = torch.cuda.LongTensor(y_test)
     train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
