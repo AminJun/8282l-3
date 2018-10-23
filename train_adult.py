@@ -94,6 +94,7 @@ def test(my_net, my_criterion, my_loader, my_device):
 
 
 if __name__ == '__main__':
+    torch.set_default_tensor_type('torch.cuda.FloatTensor')
     x_train, x_test, y_train, y_test = load_data()
     train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True)
