@@ -16,7 +16,7 @@ EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
-lr = 0.1
+lr = 0.001
 
 
 def load_data():
@@ -44,7 +44,7 @@ class Net(nn.Module):
         # print(self.fc1.weight.device)
         x = self.fc1(x)
         x = self.relu1(x)
-        x = self.dout(x)
+        # x = self.dout(x)
         x = self.fc2(x)
         x = self.prelu(x)
         x = self.out(x)
