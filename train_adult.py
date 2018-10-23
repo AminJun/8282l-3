@@ -1,14 +1,11 @@
 import numpy as np
 import torch
 import torch.nn as nn
-from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
-
-from torchvision import transforms
-from sklearn.preprocessing import MinMaxScaler
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
@@ -63,14 +60,6 @@ class ThreeLoader(Dataset):
 
     def __getitem__(self, index):
         return self.x_arr[index], self.y_arr[index]
-
-
-def accuracy(output, target):
-    """Computes the accuracy for multiple binary predictions"""
-    pred = output >= 0.5
-    truth = target >= 0.5
-    acc = pred.eq(truth).sum() / target.numel()
-    return acc
 
 
 def accuracy(output, target):
@@ -137,7 +126,7 @@ if __name__ == '__main__':
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
     # print(device)
-    opt = optim.Adam(net.parameters(), lr=lr, weight_decay=1e-5)
+    opt = optim.Adam(net.parameters(), lr=lr, weight_decay=1e-5, betas=(0.9, 0.99))
     criterion = nn.BCELoss()
     # e_losses = []
     for _ in range(EPOCHS):
