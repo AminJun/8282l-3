@@ -7,7 +7,8 @@ from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
 
-# from torchvision import transforms
+from torchvision import transforms
+from sklearn.preprocessing import MinMaxScaler
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
@@ -20,7 +21,9 @@ lr = 0.1
 
 def load_data():
     x = np.load(DATA_SET + '/data.npy').astype(np.float32)
-    x = preprocessing.scale(x)
+    x = MinMaxScaler().fit(x).transform(x)
+    # import pdb
+    # pdb.set_trace()
     y = np.expand_dims(np.load(DATA_SET + '/labels.npy').astype(np.float32), 1)
     return train_test_split(x, y, test_size=0.15)
 
