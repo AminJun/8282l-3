@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
+
 # from torchvision import transforms
 
 LOUD = False
@@ -17,7 +18,7 @@ DATA_SET = 'Adult'
 
 def load_data():
     x = np.load(DATA_SET + '/data.npy').astype(np.float32)
-    y = np.load(DATA_SET + '/labels.npy').astype(np.float32)
+    y = np.expand_dims(np.load(DATA_SET + '/labels.npy').astype(np.float32), 1)
     return train_test_split(x, y, test_size=0.15)
 
 
@@ -56,6 +57,14 @@ class ThreeLoader(Dataset):
 
     def __getitem__(self, index):
         return self.x_arr[index], self.y_arr[index]
+
+
+def accuracy(output, target):
+    """Computes the accuracy for multiple binary predictions"""
+    pred = output >= 0.5
+    truth = target >= 0.5
+    acc = pred.eq(truth).sum() / target.numel()
+    return acc
 
 
 def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
