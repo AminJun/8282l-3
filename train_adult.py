@@ -98,8 +98,8 @@ def test(my_net, my_criterion, my_loader, my_device):
             outputs = my_net(inputs)
             loss = my_criterion(outputs, targets)
             test_loss += loss.item()
-            import pdb
-            pdb.set_trace()
+            # import pdb
+            # pdb.set_trace()
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.float().eq(targets).sum().item()
