@@ -56,7 +56,7 @@ class ThreeLoader(Dataset):
         return self.x_arr[index], self.y_arr[index]
 
 
-def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
+def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
     my_net.train()
     train_loss = 0
     correct = 0
@@ -83,7 +83,7 @@ def test(my_net, my_criterion, my_loader, my_device):
     total = 0
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(my_loader):
-            inputs, targets = inputs.to(my_device), targets.to(my_device)
+            inputs, targets = inputs.to(my_device).cuda(), targets.to(my_device).cuda()
             outputs = my_net(inputs)
             loss = my_criterion(outputs, targets)
             test_loss += loss.item()
