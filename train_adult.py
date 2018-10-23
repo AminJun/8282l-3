@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from torch import optim
 from torch.backends import cudnn
@@ -14,11 +15,12 @@ EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
-lr=0.1
+lr = 0.1
 
 
 def load_data():
     x = np.load(DATA_SET + '/data.npy').astype(np.float32)
+    x = preprocessing.scale(x)
     y = np.expand_dims(np.load(DATA_SET + '/labels.npy').astype(np.float32), 1)
     return train_test_split(x, y, test_size=0.15)
 
