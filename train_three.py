@@ -38,6 +38,7 @@ class AutoEncoder(nn.Module):
             nn.Linear(28, 20), nn.ReLU(True),
             nn.Linear(20, 16))
         self.decoder = nn.Sequential(
+            nn.ReLU(True),
             nn.Linear(16, 20), nn.ReLU(True),
             nn.Linear(20, 28), nn.ReLU(True),
             # nn.Linear(24, 30), nn.ReLU(True),
@@ -58,7 +59,7 @@ if __name__ == '__main__':
     data_loader = DataLoader(ThreeLoader(train_data), batch_size=BATCH_SIZE, shuffle=True)
     model = AutoEncoder().cuda()
     criterion = nn.L1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     lambda1 = lambda \
             epoch: lr if epoch < EPOCHS / 2 else lr * 0.5 if epoch < EPOCHS / 4 else lr * 0.1
     scheduler = LambdaLR(optimizer, [lambda1])
