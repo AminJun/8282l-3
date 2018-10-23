@@ -32,17 +32,23 @@ class ThreeLoader(Dataset):
 class AutoEncoder(nn.Module):
     def __init__(self):
         super(AutoEncoder, self).__init__()
+        _mid = 16
+        _in = 33
+        _l2 = int((_mid + _in) / 2)
+        _l3 = int((_mid + _l2) / 2)
+        _l1 = int((_in + _l2) / 2)
         self.encoder = nn.Sequential(
-            nn.Linear(33, 28), nn.ReLU(True),
+            nn.Linear(_in, _l1), nn.ReLU(True),
             # nn.Linear(30, 24), nn.ReLU(True),
-            nn.Linear(28, 20), nn.ReLU(True),
-            nn.Linear(20, 16))
+            nn.Linear(_l1, _l2), nn.ReLU(True),
+            nn.Linear(_l2, _l3), nn.ReLU(True),
+            nn.Linear(_l3, _mid))
         self.decoder = nn.Sequential(
-            nn.ReLU(True),
-            nn.Linear(16, 20), nn.ReLU(True),
-            nn.Linear(20, 28), nn.ReLU(True),
+            nn.Linear(_mid, _l3), nn.ReLU(True),
+            nn.Linear(_l3, _l2), nn.ReLU(True),
+            nn.Linear(_l2, _l1), nn.ReLU(True),
             # nn.Linear(24, 30), nn.ReLU(True),
-            nn.Linear(28, 33), nn.Tanh())
+            nn.Linear(_l1, _in), nn.Tanh())
 
     def forward(self, x):
         return self.decoder(self.encoder(x))
