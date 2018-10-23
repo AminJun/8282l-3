@@ -25,7 +25,7 @@ class ThreeLoader(Dataset):
         return self.x_arr.shape[0]
 
     def __getitem__(self, index):
-        return self.transform(self.x_arr[index]), self.x_arr[index]
+        return self.x_arr[index], self.x_arr[index]
 
 
 class AutoEncoder(nn.Module):
