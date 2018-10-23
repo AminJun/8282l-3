@@ -63,8 +63,9 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
     total = 0
     for batch_idx, (inputs, targets) in enumerate(my_loader):
         inputs, targets = inputs.to(my_device), targets.to(my_device)
+
         my_optimizer.zero_grad()
-        outputs = my_net(inputs)
+        outputs = my_net(inputs.cuda())
         loss = my_criterion(outputs, targets)
         loss.backward()
         my_optimizer.step()
