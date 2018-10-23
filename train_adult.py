@@ -67,6 +67,14 @@ def accuracy(output, target):
     return acc
 
 
+def accuracy(output, target):
+    """Computes the accuracy for multiple binary predictions"""
+    pred = output >= 0.5
+    truth = target >= 0.5
+    acc = pred.eq(truth).sum() / target.numel()
+    return acc
+
+
 def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
     my_net.train()
     train_loss = 0
@@ -81,10 +89,11 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
         loss.backward()
         my_optimizer.step()
         train_loss += loss.item()
-        _, predicted = outputs.max(1)
+        my_acc = accuracy(outputs, targets)
+        # _, predicted = outputs.max(1)
         total += targets.size(0)
-        correct += predicted.float().eq(targets).sum().item()
-    print('Loss: %.3f | ACC: %.3f' % (train_loss, 100. * correct / total))
+        # correct += predicted.float().eq(targets).sum().item()
+    print('Loss: %.3f | ACC: %.3f' % (train_loss, 100. * my_acc))
 
 
 def test(my_net, my_criterion, my_loader, my_device):
@@ -100,10 +109,11 @@ def test(my_net, my_criterion, my_loader, my_device):
             test_loss += loss.item()
             # import pdb
             # pdb.set_trace()
-            _, predicted = outputs.max(1)
+            # _, predicted = outputs.max(1)
+            my_acc = accuracy(outputs, targets)
             total += targets.size(0)
-            correct += predicted.float().eq(targets).sum().item()
-    print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * correct / total))
+            # correct += predicted.float().eq(targets).sum().item()
+    print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * my_acc))
 
 
 if __name__ == '__main__':
