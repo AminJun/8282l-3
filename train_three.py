@@ -10,11 +10,11 @@ from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
-EPOCHS = 12
+EPOCHS = 20
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
-lr = 1e-3
+lr = 1e-2
 
 
 class ThreeLoader(Dataset):
@@ -33,13 +33,15 @@ class AutoEncoder(nn.Module):
     def __init__(self):
         super(AutoEncoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(33, 24), nn.ReLU(True),
+            nn.Linear(33, 30), nn.ReLU(True),
+            nn.Linear(30, 24), nn.ReLU(True),
             nn.Linear(24, 18), nn.ReLU(True),
             nn.Linear(18, 16))
         self.decoder = nn.Sequential(
             nn.Linear(16, 18), nn.ReLU(True),
             nn.Linear(18, 24), nn.ReLU(True),
-            nn.Linear(24, 33), nn.Tanh())
+            nn.Linear(24, 30), nn.ReLU(True),
+            nn.Linear(30, 33), nn.Tanh())
 
     def forward(self, x):
         return self.decoder(self.encoder(x))
