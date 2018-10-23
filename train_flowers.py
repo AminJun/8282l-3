@@ -142,4 +142,4 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     for _ in range(200):
         train(net, optimizer, criterion, train_loader, device)
-        test(net, criterion, train_loader, device)
+        test(net, criterion, test_loader, device)

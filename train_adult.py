@@ -1,8 +1,10 @@
 import numpy as np
+import torch
 import torch.nn as nn
 from sklearn.model_selection import train_test_split
 from torch import optim
-from torch.utils.data import Dataset
+from torch.backends import cudnn
+from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
@@ -73,13 +75,17 @@ class ThreeLoader(Dataset):
 
 if __name__ == '__main__':
     x_train, x_test, y_train, y_test = load_data()
+    train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     net = Net()
+    net = net.to(device)
+    if device == 'cuda':
+        net = torch.nn.DataParallel(net)
+        cudnn.benchmark = True
     opt = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
     criterion = nn.BCELoss()
-    e_losses = []
+    # e_losses = []
     for _ in range(EPOCHS):
-        e_losses += train(net, opt, criterion, )
-
+        train(net, opt, criterion, train_loader)
     import pdb
-
     pdb.set_trace()

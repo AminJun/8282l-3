@@ -37,7 +37,8 @@ class AutoEncoder(nn.Module):
         _l3 = int((_mid + _l2) / 2)
         _l1 = int((_in + _l2) / 2)
         self.encoder = nn.Sequential(
-            nn.Linear(_in, _l1), nn.ReLU(True),
+            nn.Linear(_in, _l1),
+            # , nn.ReLU(True),
             # nn.Linear(30, 24), nn.ReLU(True),
             nn.Linear(_l1, _l2), nn.ReLU(True),
             # nn.Linear(_l2, _l3), nn.ReLU(True),
