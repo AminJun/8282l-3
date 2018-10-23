@@ -17,16 +17,18 @@ DATA_SET = 'Adult'
 def load_data():
     x = np.load(DATA_SET + '/data.npy')
     y = np.load(DATA_SET + '/labels.npy')
+    import pdb
+    pdb.set_trace()
     return train_test_split(x, y, test_size=0.15)
 
 
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(50, 50)
+        self.fc1 = nn.Linear(67, 80)
         self.relu1 = nn.ReLU()
         self.dout = nn.Dropout(0.2)
-        self.fc2 = nn.Linear(50, 100)
+        self.fc2 = nn.Linear(80, 100)
         self.prelu = nn.PReLU(1)
         self.out = nn.Linear(100, 1)
         self.out_act = nn.Sigmoid()
@@ -92,6 +94,8 @@ class ThreeLoader(Dataset):
 
 if __name__ == '__main__':
     x_train, x_test, y_train, y_test = load_data()
+    import pdb
+    pdb.set_trace()
     train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
