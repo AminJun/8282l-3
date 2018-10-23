@@ -82,8 +82,8 @@ std = 1
 
 
 def load_data():
-    x = np.load(DATA_SET + '/flower_imgs.npy')
-    y = np.load(DATA_SET + '/flower_labels.npy')
+    x = np.load(DATA_SET + '/flower_imgs.npy').astype(np.float32)
+    y = np.load(DATA_SET + '/flower_labels.npy').astype(np.float32)
     x = np.rollaxis(x, 3, 1) / 255.
     channeled = x.swapaxes(0, 1).reshape((3, -1))
     return train_test_split(x, y, test_size=0.15), channeled.mean(1), channeled.std(1)
