@@ -100,8 +100,8 @@ if __name__ == '__main__':
     x_train, x_test, y_train, y_test = load_data()
     # y_train = torch.cuda.LongTensor(y_train)
     # y_test = torch.cuda.LongTensor(y_test)
-    train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True, num_workers=10)
-    test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True, num_workers=10)
+    train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
+    test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     net = Net()
     net = net.to(device)
@@ -110,7 +110,7 @@ if __name__ == '__main__':
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
     print(device)
-    opt = optim.Adam(net.parameters(), lr=0.1, betas=(0.9, 0.999))
+    opt = optim.Adam(net.parameters(), lr=0.1, weight_decay=1e-5)
     criterion = nn.BCELoss()
     # e_losses = []
     for _ in range(EPOCHS):
