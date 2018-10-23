@@ -17,7 +17,7 @@ DATA_SET = 'Adult'
 
 def load_data():
     x = np.load(DATA_SET + '/data.npy').astype(np.float32)
-    y = np.load(DATA_SET + '/labels.npy').astype(np.int32)
+    y = np.load(DATA_SET + '/labels.npy').astype(np.float32)
     return train_test_split(x, y, test_size=0.15)
 
 
@@ -33,8 +33,8 @@ class Net(nn.Module):
         self.out_act = nn.Sigmoid()
 
     def forward(self, x):
-        print(x.device)
-        print(self.fc1.weight.device)
+        # print(x.device)
+        # print(self.fc1.weight.device)
         x = self.fc1(x)
         x = self.relu1(x)
         x = self.dout(x)
