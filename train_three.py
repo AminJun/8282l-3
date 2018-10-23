@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 200
-EPOCHS = 12
+EPOCHS = 16
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
