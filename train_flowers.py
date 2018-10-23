@@ -1,0 +1,146 @@
+import numpy as np
+import torch
+import torch.nn as nn
+import torchvision.transforms as transforms
+from sklearn.model_selection import train_test_split
+from torch.backends import cudnn
+from torch.utils.data import Dataset, DataLoader
+
+_STRUCTURE = [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M']
+
+
+class FlowerLoader(Dataset):
+    def __init__(self, x_arr, y_arr, transform=None):
+        self.x_arr = x_arr
+        self.y_arr = y_arr
+        self.transform = transform
+
+    def __len__(self):
+        return self.x_arr.shape[0]
+
+    def __getitem__(self, index):
+        img = self.x_arr[index]
+        label = self.y_arr[index]
+        if self.transform is not None:
+            img = self.transform(img)
+        return img, label
+
+
+class TrainLoader(FlowerLoader):
+    def __init__(self, x_arr, y_arr, arr_mean, arr_std):
+        super(TrainLoader, self).__init__(x_arr, y_arr, transforms.Compose([
+            transforms.ToPILImage(), transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(), transforms.ToTensor(),
+            transforms.Normalize(arr_mean, arr_std),
+        ]))
+
+
+class TestLoader(FlowerLoader):
+    def __init__(self, x_arr, y_arr, arr_mean, arr_std):
+        super(TestLoader, self).__init__(x_arr, y_arr, transforms.Compose([
+            transforms.ToPILImage(), transforms.ToTensor(),
+            transforms.Normalize(arr_mean, arr_std),
+        ]))
+
+
+class VGG(nn.Module):
+    def __init__(self):
+        super(VGG, self).__init__()
+        self.features = self._make_layers(_STRUCTURE)
+        self.classifier = nn.Linear(512, 10)  # TODO
+
+    def forward(self, x):
+        out = self.features(x)
+        out = out.view(out.size(0), -1)
+        out = self.classifier(out)
+        return out
+
+    def _make_layers(self, cfg):
+        layers = []
+        in_channels = 3
+        for x in cfg:
+            if x == 'M':
+                layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+            else:
+                layers += [nn.Conv2d(in_channels, x, kernel_size=3, padding=1),
+                           nn.BatchNorm2d(x),
+                           nn.ReLU(inplace=True)]
+                in_channels = x
+        layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
+        return nn.Sequential(*layers)
+
+
+SHAPE = (28, 28, 1)
+LOUD = False
+BATCH_SIZE = 128  # Must be in range (16, 100)
+EPOCHS = 12
+pre_learn_weights = []
+post_learn_weights = []
+DATA_SET = 'Flowers'
+_mean = 0
+std = 1
+
+
+def load_data():
+    x = np.load(DATA_SET + '/flower_imgs.npy').astype(np.float32) / 255.0
+    y = np.load(DATA_SET + '/flower_labels.npy').astype(np.float32)
+    x = np.rollaxis(x, 3, 1)
+    channeled = x.swapaxes(0, 1).reshape((3, -1))
+    return train_test_split(x, y, test_size=0.15), channeled.mean(1), channeled.std(1)
+
+
+def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
+    my_net.train()
+    train_loss = 0
+    correct = 0
+    total = 0
+    for batch_idx, (inputs, targets) in enumerate(my_loader):
+        inputs, targets = inputs.to(my_device), targets.to(my_device)
+        my_optimizer.zero_grad()
+        outputs = my_net(inputs)
+        loss = my_criterion(outputs, targets)
+        loss.backward()
+        my_optimizer.step()
+        train_loss += loss.item()
+        _, predicted = outputs.max(1)
+        total += targets.size(0)
+        correct += predicted.eq(targets).sum().item()
+        print('Loss: %.3f | ACC: %.3f', train_loss, 100. * correct / total)
+
+
+def test(my_net, my_criterion, my_loader, my_device):
+    my_net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in enumerate(my_loader):
+            inputs, targets = inputs.to(my_device), targets.to(my_device)
+            outputs = my_net(inputs)
+            loss = my_criterion(outputs, targets)
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+            print('Loss: %.3f | ACC: %.3f', test_loss, 100. * correct / total)
+
+
+if __name__ == '__main__':
+    data, mean, std = load_data()
+    x_train, x_test, y_train, y_test = data
+    train_loader = DataLoader(TrainLoader(x_train, y_train, mean, std), batch_size=BATCH_SIZE,
+                              shuffle=True)
+    test_loader = DataLoader(TestLoader(x_test, y_test, mean, std), batch_size=BATCH_SIZE,
+                             shuffle=False)
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    net = VGG()
+    net = net.to(device)
+    if device == 'cuda':
+        net = torch.nn.DataParallel(net)
+        cudnn.benchmark = True
+    criterion = nn.CrossEntropyLoss()
+    lr = 0.1
+    optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
+    train(net, optimizer, criterion, train_loader, device)
+    test(net, criterion, train_loader, device)

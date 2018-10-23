@@ -1,3 +1,5 @@
+Flower:
+
 
 an error of less than 0.001 after dividing the L1Loss by the batch size, correct?
 I believe datapoints is supposed to be dimensions.  So the autoencoder has to have 1 layer that's <= 16 neurons wide.
