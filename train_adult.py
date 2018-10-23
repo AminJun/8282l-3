@@ -11,12 +11,12 @@ from torchvision import transforms
 from sklearn.preprocessing import MinMaxScaler
 
 LOUD = False
-BATCH_SIZE = 28  # Must be in range (16, 100)
-EPOCHS = 100
+BATCH_SIZE = 128  # Must be in range (16, 100)
+EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
-lr = 0.001
+lr = 0.01
 
 
 def load_data():
