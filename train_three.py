@@ -58,7 +58,7 @@ if __name__ == '__main__':
     data_loader = DataLoader(ThreeLoader(train_data), batch_size=BATCH_SIZE, shuffle=True)
     model = AutoEncoder().cuda()
     criterion = nn.L1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
     lambda1 = lambda \
             epoch: lr if epoch < EPOCHS / 2 else lr * 0.5 if epoch < EPOCHS / 4 else lr * 0.1
     scheduler = LambdaLR(optimizer, [lambda1])
