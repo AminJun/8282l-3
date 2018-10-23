@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
@@ -17,8 +18,6 @@ DATA_SET = 'Adult'
 def load_data():
     x = np.load(DATA_SET + '/data.npy')
     y = np.load(DATA_SET + '/labels.npy')
-    import pdb
-    pdb.set_trace()
     return train_test_split(x, y, test_size=0.15)
 
 
@@ -42,6 +41,19 @@ class Net(nn.Module):
         x = self.out(x)
         x = self.out_act(x)
         return x
+
+
+class ThreeLoader(Dataset):
+    def __init__(self, x_arr, y_arr):
+        self.x_arr = x_arr
+        self.y_arr = y_arr
+        self.transform =transforms.Compose(transforms.ToTensor())
+
+    def __len__(self):
+        return self.x_arr.shape[0]
+
+    def __getitem__(self, index):
+        return self.transform(self.x_arr[index]), self.y_arr[index]
 
 
 def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
@@ -80,22 +92,8 @@ def test(my_net, my_criterion, my_loader, my_device):
     print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * correct / total))
 
 
-class ThreeLoader(Dataset):
-    def __init__(self, x_arr, y_arr):
-        self.x_arr = x_arr
-        self.y_arr = y_arr
-
-    def __len__(self):
-        return self.x_arr.shape[0]
-
-    def __getitem__(self, index):
-        return self.x_arr[index], self.y_arr[index]
-
-
 if __name__ == '__main__':
     x_train, x_test, y_train, y_test = load_data()
-    import pdb
-    pdb.set_trace()
     train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -110,6 +108,3 @@ if __name__ == '__main__':
     for _ in range(EPOCHS):
         train(net, opt, criterion, train_loader)
         test(net, criterion, test_loader, device)
-    import pdb
-
-    pdb.set_trace()
