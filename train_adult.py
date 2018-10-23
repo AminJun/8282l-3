@@ -103,6 +103,7 @@ if __name__ == '__main__':
     if device == 'cuda':
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
+    print(device)
     opt = optim.Adam(net.parameters(), lr=0.001, betas=(0.9, 0.999))
     criterion = nn.BCELoss()
     # e_losses = []
