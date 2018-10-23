@@ -16,7 +16,7 @@ EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
-lr = 0.01
+lr = 0.1
 
 
 def load_data():
