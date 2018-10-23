@@ -16,8 +16,8 @@ DATA_SET = 'Adult'
 
 
 def load_data():
-    x = np.load(DATA_SET + '/data.npy')
-    y = np.load(DATA_SET + '/labels.npy')
+    x = np.load(DATA_SET + '/data.npy').astype(np.float32)
+    y = np.load(DATA_SET + '/labels.npy').astype(np.int32)
     return train_test_split(x, y, test_size=0.15)
 
 
