@@ -29,7 +29,7 @@ class FlowerLoader(Dataset):
 class TrainLoader(FlowerLoader):
     def __init__(self, x_arr, y_arr, arr_mean, arr_std):
         super(TrainLoader, self).__init__(x_arr, y_arr, transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.ToPILImage(), transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(), transforms.ToTensor(),
             transforms.Normalize(arr_mean, arr_std),
         ]))
@@ -38,7 +38,7 @@ class TrainLoader(FlowerLoader):
 class TestLoader(FlowerLoader):
     def __init__(self, x_arr, y_arr, arr_mean, arr_std):
         super(TestLoader, self).__init__(x_arr, y_arr, transforms.Compose([
-            transforms.ToTensor(),
+            transforms.ToPILImage(), transforms.ToTensor(),
             transforms.Normalize(arr_mean, arr_std),
         ]))
 
