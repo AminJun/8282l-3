@@ -60,7 +60,7 @@ if __name__ == '__main__':
     criterion = nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     lambda1 = lambda \
-            epoch: lr if epoch < EPOCHS / 2 else lr * 0.3 if epoch < EPOCHS / 4 else lr * 0.01
+            epoch: lr if epoch < EPOCHS / 3 else lr * 0.3 if epoch < 2 * EPOCHS / 3 else lr * 0.01
     scheduler = LambdaLR(optimizer, [lambda1])
     for epoch in range(EPOCHS):
         for data in data_loader:
