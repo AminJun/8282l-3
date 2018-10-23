@@ -64,7 +64,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
     correct = 0
     total = 0
     for batch_idx, (inputs, targets) in enumerate(my_loader):
-        inputs, targets = inputs.to(my_device), targets.to(my_device)
+        inputs, targets = inputs.to(my_device), targets.to(my_device).float()
 
         my_optimizer.zero_grad()
         outputs = my_net(inputs.cuda())
