@@ -14,6 +14,7 @@ EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
+lr=0.1
 
 
 def load_data():
@@ -131,7 +132,7 @@ if __name__ == '__main__':
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
     # print(device)
-    opt = optim.Adam(net.parameters(), lr=1, weight_decay=1e-5)
+    opt = optim.Adam(net.parameters(), lr=lr, weight_decay=1e-5)
     criterion = nn.BCELoss()
     # e_losses = []
     for _ in range(EPOCHS):
