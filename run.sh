@@ -1,2 +1,2 @@
 git pull 
-python train_flowers.py
+python train_three.py
