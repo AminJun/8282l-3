@@ -74,7 +74,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
         train_loss += loss.item()
         _, predicted = outputs.max(1)
         total += targets.size(0)
-        correct += predicted.eq(targets).sum().item()
+        correct += predicted.float().eq(targets).sum().item()
     print('Loss: %.3f | ACC: %.3f' % (train_loss, 100. * correct / total))
 
 
