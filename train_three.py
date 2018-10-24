@@ -9,12 +9,12 @@ from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
-BATCH_SIZE = 200
+BATCH_SIZE = 64
 EPOCHS = 100
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
-lr = 1e-1
+lr = 5e-2
 
 
 class ThreeLoader(Dataset):
@@ -31,23 +31,19 @@ class ThreeLoader(Dataset):
 class AutoEncoder(nn.Module):
     def __init__(self):
         super(AutoEncoder, self).__init__()
-        _mid = 14
+        _mid = 16
         _in = 33
         _l2 = int((_mid + _in) / 2)
         _l3 = int((_mid + _l2) / 2)
         _l1 = int((_in + _l2) / 2)
         self.encoder = nn.Sequential(
-            nn.Linear(_in, _l1),
-            # , nn.ReLU(True),
-            # nn.Linear(30, 24), nn.ReLU(True),
-            nn.Linear(_l1, _l2), nn.ReLU(True),
-            # nn.Linear(_l2, _l3), nn.ReLU(True),
-            nn.Linear(_l2, _mid))
+            nn.Linear(_in, _l1), nn.Tanh(),
+            #nn.Linear(_l1, _l2), nn.Tanh(),
+            nn.Linear(_l1, _mid))
         self.decoder = nn.Sequential(
-            nn.Linear(_mid, _l3), nn.ReLU(True),
-            nn.Linear(_l3, _l2), nn.ReLU(True),
-            nn.Linear(_l2, _l1), nn.ReLU(True),
-            # nn.Linear(24, 30), nn.ReLU(True),
+            nn.Linear(_mid, _l1), nn.Tanh(),
+            #nn.Linear(_l3, _l2), nn.ReLU(True),
+            #nn.Linear(_l2, _l1), nn.Tanh(),
             nn.Linear(_l1, _in), nn.Tanh())
 
     def forward(self, x):
@@ -67,8 +63,9 @@ if __name__ == '__main__':
     criterion = nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     lambda1 = lambda \
-            epoch: lr if epoch < EPOCHS / 2 else lr * 0.5 if epoch < 3 * EPOCHS / 4 else lr * 0.1
+            epoch: lr if epoch < EPOCHS / 2 else lr * 0.1 if epoch < 3 * EPOCHS / 4 else lr * 0.01
     scheduler = LambdaLR(optimizer, [lambda1])
+    losses = [] 
     for epoch in range(EPOCHS):
         for data in data_loader:
             img, _ = data
@@ -76,11 +73,12 @@ if __name__ == '__main__':
             img = Variable(img).cuda()
             # ===================forward=====================
             output = model(img)
-            loss = criterion(img, output)
+            loss = criterion(output, img)
             # ===================backward====================
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             scheduler.step(epoch)
+            losses.append(float(nn.functional.l1_loss(output, img)))
             # ===================log========================
-            print('epoch [{}/{}], loss:{:.4f}'.format(epoch + 1, EPOCHS, loss.data[0]))
+        print('epoch [{}/{}], loss:{:.4f}'.format(epoch + 1, EPOCHS, np.mean(np.array(losses))))
