@@ -129,6 +129,9 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
                     if int(targets[i]) != int(predicted[i]):
                         import pdb
                         new_image = np.rollaxis(np.array(inputs[i]), 0, 3)
+                        new_image -= np.min(new_image)
+                        new_image /= np.max(new_image)
+                        new_image *= 255
                         pdb.set_trace()
                         imgsv.imsave(DATA_SET + '_{}.png'.format(targets[i]), new_image)
     total_accuracy = float(100. * correct / total)
