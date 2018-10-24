@@ -1,2 +1,2 @@
 git pull
-python train_flowers.py True
+python train_adult.py True

@@ -27,7 +27,7 @@ def load_data():
     pdb.set_trace()
     # Uncomment to get ride of the redundant data
     # both = np.concatenate((x, y), axis=1)
-    # data = np.unique(both, axis=1)
+    # data = np.unique(both, axis=0)
     # x = data[:, :-1]
     # y = data[:, -1:]
     return train_test_split(x, y, test_size=0.15)
@@ -93,8 +93,8 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
         tacc.append(my_acc)
         total += targets.size(0)
         # correct += predicted.float().eq(targets).sum().item()
-    curr_accuracy = 100. * np.mean(np.array(tacc))[0]
-    print('Train: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(train_loss))[0], curr_accuracy))
+    curr_accuracy = 100. * np.mean(np.array(tacc))
+    print('Train: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(train_loss)), curr_accuracy))
     return curr_accuracy
 
 
@@ -113,8 +113,8 @@ def test(my_net, my_criterion, my_loader, my_device):
             my_acc = accuracy(outputs, targets)
             tacc.append(my_acc)
             total += targets.size(0)
-    curr_accuracy = 100. * np.mean(np.array(tacc))[0]
-    print('Test: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(test_loss))[0], curr_accuracy))
+    curr_accuracy = 100. * np.mean(np.array(tacc))
+    print('Test: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(test_loss)), curr_accuracy))
     return curr_accuracy
 
 
