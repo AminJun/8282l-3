@@ -109,7 +109,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
     return total_accuracy
 
 
-def test(my_net, my_criterion, my_loader, my_device):
+def test(my_net, my_criterion, my_loader, my_device, save=False):
     my_net.eval()
     test_loss = 0
     correct = 0
@@ -123,6 +123,9 @@ def test(my_net, my_criterion, my_loader, my_device):
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
+            if save:
+                import pdb
+                pdb.set_trace()
     total_accuracy = float(100. * correct / total)
     print('Test Loss: %.3f | ACC: %.3f' % (test_loss, total_accuracy))
     return total_accuracy
@@ -197,4 +200,5 @@ if __name__ == '__main__':
         draw_accuracies(train_accuracy, test_accuracy)
         post_learn_weights = extract_weights(net)
         plot()
-        mrs_labeled()
+        test(net, criterion, test_loader, device, True)
+        # mrs_labeled()
