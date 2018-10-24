@@ -1,3 +1,6 @@
+import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
@@ -8,7 +11,7 @@ from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
-BATCH_SIZE = 64#128  # Must be in range (16, 100)
+BATCH_SIZE = 64  # 128  # Must be in range (16, 100)
 EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
@@ -20,10 +23,13 @@ def load_data():
     x = np.load(DATA_SET + '/data.npy').astype(np.float32)
     x = MinMaxScaler().fit(x).transform(x)
     y = np.expand_dims(np.load(DATA_SET + '/labels.npy').astype(np.float32), 1)
-    both = np.concatenate((x,y), axis=1)
-    data = np.unique(both, axis=1)
-    x = data[:,:-1]
-    y = data[:,-1:]
+    import pdb
+    pdb.set_trace()
+    # Uncomment to get ride of the redundant data
+    # both = np.concatenate((x, y), axis=1)
+    # data = np.unique(both, axis=1)
+    # x = data[:, :-1]
+    # y = data[:, -1:]
     return train_test_split(x, y, test_size=0.15)
 
 
@@ -39,11 +45,8 @@ class Net(nn.Module):
         self.out_act = nn.Sigmoid()
 
     def forward(self, x):
-        #print(x.device)
-        #print(self.fc1.weight.device)
         x = self.fc1(x)
         x = self.relu1(x)
- #       x = self.dout(x)
         x = self.fc2(x)
         x = self.prelu(x)
         x = self.out(x)
@@ -55,7 +58,6 @@ class ThreeLoader(Dataset):
     def __init__(self, x_arr, y_arr):
         self.x_arr = x_arr
         self.y_arr = y_arr
-        # self.transform =transforms.Compose(transforms.ToTensor())
 
     def __len__(self):
         return self.x_arr.shape[0]
@@ -77,7 +79,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
     train_loss = []
     correct = 0
     total = 0
-    tacc = [] 
+    tacc = []
     for batch_idx, (inputs, targets) in enumerate(my_loader):
         inputs, targets = inputs.to(my_device), targets.to(my_device)
 
@@ -86,12 +88,14 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
         loss = my_criterion(outputs, targets)
         loss.backward()
         my_optimizer.step()
-        train_loss.append( loss.item())
+        train_loss.append(loss.item())
         my_acc = accuracy(outputs, targets)
         tacc.append(my_acc)
         total += targets.size(0)
         # correct += predicted.float().eq(targets).sum().item()
-    print('Train: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(train_loss)), 100. * np.mean(np.array(tacc))))
+    curr_accuracy = 100. * np.mean(np.array(tacc))[0]
+    print('Train: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(train_loss))[0], curr_accuracy))
+    return curr_accuracy
 
 
 def test(my_net, my_criterion, my_loader, my_device):
@@ -99,39 +103,66 @@ def test(my_net, my_criterion, my_loader, my_device):
     test_loss = []
     correct = 0
     total = 0
-    tacc = [] 
+    tacc = []
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(my_loader):
             inputs, targets = inputs.to(my_device).cuda(), targets.to(my_device).cuda()
             outputs = my_net(inputs)
             loss = my_criterion(outputs, targets)
-            test_loss.append( loss.item() )
+            test_loss.append(loss.item())
             my_acc = accuracy(outputs, targets)
             tacc.append(my_acc)
             total += targets.size(0)
-    print('Test: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(test_loss)), 100. * np.mean(np.array(tacc))))
+    curr_accuracy = 100. * np.mean(np.array(tacc))[0]
+    print('Test: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(test_loss))[0], curr_accuracy))
+    return curr_accuracy
+
+
+def extract_weights(my_net):
+    arr = np.array([])
+    for d in my_net.parameters():
+        arr = np.append(arr, np.array(d.data).flatten())
+    return arr
+
+
+def draw_accuracies(train_acc, test_acc):
+    plt.cla()
+    plt.plot(train_acc, label='Train Accuracy')
+    plt.plot(test_acc, label='Test Accuracy')
+    plt.legend()
+    plt.savefig(DATA_SET + '_acc_plt.png')
+
+
+def plot():
+    plt.cla()
+    plt.hist(pre_learn_weights, label='Pre Training', range=(-0.5, 0.5), bins=1000, alpha=0.6)
+    plt.hist(post_learn_weights, label='Post Training', range=(-0.5, 0.5), bins=1000, alpha=0.6)
+    plt.legend()
+    plt.savefig(DATA_SET + '_plt.png')
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        LOUD = sys.argv[1].lower() == 'true'
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
     x_train, x_test, y_train, y_test = load_data()
-    # y_train = torch.cuda.LongTensor(y_train)
-    # y_test = torch.cuda.LongTensor(y_test)
     train_loader = DataLoader(ThreeLoader(x_train, y_train), batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(ThreeLoader(x_test, y_test), batch_size=BATCH_SIZE, shuffle=True)
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     net = Net()
     net = net.to(device)
     if device == 'cuda':
-        # net = net.cuda()
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = True
-    # print(device)
     opt = optim.Adam(net.parameters(), lr=lr, weight_decay=1e-5, betas=(0.9, 0.99))
     criterion = nn.BCELoss()
-    # e_losses = []
-    test(net, criterion, train_loader, device)
-    test(net, criterion, test_loader, device)
+    test_accuracy = []
+    train_accuracy = []
     for _ in range(EPOCHS):
-        train(net, opt, criterion, train_loader, device)
-        test(net, criterion, test_loader, device)
+        train_accuracy.append(train(net, opt, criterion, train_loader, device))
+        test_accuracy.append(test(net, criterion, test_loader, device))
+
+    if LOUD:
+        draw_accuracies(train_accuracy, test_accuracy)
+        post_learn_weights = extract_weights(net)
+        plot()

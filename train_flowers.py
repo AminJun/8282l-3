@@ -154,23 +154,10 @@ def draw_accuracies(train_acc, test_acc):
 
 def plot():
     plt.cla()
-    # mn = min(np.min(pre_learn_weights), np.min(post_learn_weights))
-    # mx = max(np.max(pre_learn_weights), np.max(post_learn_weights))
     plt.hist(pre_learn_weights, label='Pre Training', range=(-0.5, 0.5), bins=1000, alpha=0.6)
     plt.hist(post_learn_weights, label='Post Training', range=(-0.5, 0.5), bins=1000, alpha=0.6)
     plt.legend()
     plt.savefig(DATA_SET + '_plt.png')
-
-
-# def mrs_labeled():
-#     pred = net(x_test)
-#     true_class = y_test.argmax(axis=1)
-#     incorrects = np.nonzero(pred != true_class)
-#     class_examples = [(incorrects[0][true_class[incorrects] == cls]) for cls in range(10)]
-#     for cls_ex in class_examples:
-#         if len(cls_ex):
-#             plt.imsave(DATA_SET + '_{}.png'.format(true_class[cls_ex[0]]),
-#                        x_test[cls_ex[0]].squeeze())
 
 
 if __name__ == '__main__':
@@ -208,4 +195,3 @@ if __name__ == '__main__':
         post_learn_weights = extract_weights(net)
         plot()
         test(net, criterion, test_loader, device, True)
-        # mrs_labeled()
