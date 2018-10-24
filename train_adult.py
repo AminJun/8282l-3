@@ -12,7 +12,7 @@ from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 64  # 128  # Must be in range (16, 100)
-EPOCHS = 10
+EPOCHS = 1
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
@@ -114,8 +114,6 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             if save:
                 for i in range(len(targets)):
                     if abs(targets[i] - outputs[i]) > 0.5:
-                        import pdb
-                        pdb.set_trace()
                         print(list(inputs[i]))
     curr_accuracy = 100. * np.mean(np.array(tacc))
     print('Test: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(test_loss)), curr_accuracy))
@@ -172,6 +170,7 @@ if __name__ == '__main__':
         draw_accuracies(train_accuracy, test_accuracy)
         post_learn_weights = extract_weights(net)
         plot()
+        test_accuracy.append(test(net, criterion, test_loader, device, True))
 
 
 # 45222
