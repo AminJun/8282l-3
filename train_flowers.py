@@ -152,6 +152,16 @@ def plot():
     plt.legend()
     plt.savefig(DATA_SET + '_plt.png')
 
+def mrs_labeled():
+    pred = net(x_test)
+    true_class = y_test.argmax(axis=1)
+    incorrects = np.nonzero(pred != true_class)
+    class_examples = [(incorrects[0][true_class[incorrects] == cls]) for cls in range(10)]
+    for cls_ex in class_examples:
+        if len(cls_ex):
+            plt.imsave(DATA_SET + '_{}.png'.format(true_class[cls_ex[0]]),
+                       x_test[cls_ex[0]].squeeze())
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -187,7 +197,4 @@ if __name__ == '__main__':
         draw_accuracies(train_accuracy, test_accuracy)
         post_learn_weights = extract_weights(net)
         plot()
-
-    import pdb
-
-    pdb.set_trace()
+        mrs_labeled()
