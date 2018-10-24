@@ -76,7 +76,7 @@ class VGG(nn.Module):
 
 LOUD = False
 BATCH_SIZE = 128  # Must be in range (16, 100)
-EPOCHS = 2
+EPOCHS = 200
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Flowers'
