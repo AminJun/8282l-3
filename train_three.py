@@ -1,6 +1,8 @@
+import sys
+
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torchvision.transforms as transforms
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from torch import nn
@@ -10,7 +12,7 @@ from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 64
-EPOCHS = 100
+EPOCHS = 3
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Three Meter'
@@ -38,12 +40,12 @@ class AutoEncoder(nn.Module):
         _l1 = int((_in + _l2) / 2)
         self.encoder = nn.Sequential(
             nn.Linear(_in, _l1), nn.Tanh(),
-            #nn.Linear(_l1, _l2), nn.Tanh(),
+            # nn.Linear(_l1, _l2), nn.Tanh(),
             nn.Linear(_l1, _mid))
         self.decoder = nn.Sequential(
             nn.Linear(_mid, _l1), nn.Tanh(),
-            #nn.Linear(_l3, _l2), nn.ReLU(True),
-            #nn.Linear(_l2, _l1), nn.Tanh(),
+            # nn.Linear(_l3, _l2), nn.ReLU(True),
+            # nn.Linear(_l2, _l1), nn.Tanh(),
             nn.Linear(_l1, _in), nn.Tanh())
 
     def forward(self, x):
@@ -56,29 +58,95 @@ def load_data():
     return train_test_split(x, test_size=0.15)
 
 
+def extract_weights(my_net):
+    arr = np.array([])
+    for d in my_net.parameters():
+        arr = np.append(arr, np.array(d.data).flatten())
+    return arr
+
+
+def draw_accuracies(train_acc, test_acc):
+    plt.cla()
+    plt.plot(train_acc, label='Train Accuracy')
+    plt.plot(test_acc, label='Test Accuracy')
+    plt.legend()
+    plt.savefig(DATA_SET + '_acc_plt.png')
+
+
+def plot():
+    plt.cla()
+    plt.hist(pre_learn_weights, label='Pre Training', range=(-0.5, 0.5), bins=1000, alpha=0.6)
+    plt.hist(post_learn_weights, label='Post Training', range=(-0.5, 0.5), bins=1000, alpha=0.6)
+    plt.legend()
+    plt.savefig(DATA_SET + '_plt.png')
+
+
+def train(my_net, my_optimizer, my_criterion, my_loader, my_scheduler, c_epoch):
+    my_net.train()
+    losses = []
+    for data in my_loader:
+        img, _ = data
+        img = img.view(img.size(0), -1)
+        img = Variable(img).cuda()
+        # ===================forward=====================
+        output = my_net(img)
+        loss = my_criterion(output, img)
+        # ===================backward====================
+        my_optimizer.zero_grad()
+        loss.backward()
+        my_optimizer.step()
+        my_scheduler.step(c_epoch)
+        losses.append(float(nn.functional.l1_loss(output, img)))
+    curr_accuracy = np.mean(np.array(losses))
+    print('Train: Loss: %.4f' % (curr_accuracy))
+    return curr_accuracy
+
+
+def test(my_net, my_criterion, my_loader, my_device, save=False):
+    my_net.eval()
+    with torch.no_grad():
+        losses = []
+        for data in my_loader:
+            img, _ = data
+            img = img.view(img.size(0), -1)
+            img = Variable(img).cuda()
+            # ===================forward=====================
+            output = my_net(img)
+            # loss = criterion(output, img)
+            # ===================backward====================
+            # optimizer.zero_grad()
+            # loss.backward()
+            # optimizer.step()
+            # scheduler.step(epoch)
+            losses.append(float(nn.functional.l1_loss(output, img)))
+        curr_accuracy = np.mean(np.array(losses))
+        print('Train: Loss: %.4f' % (curr_accuracy))
+        return curr_accuracy
+
+
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        LOUD = sys.argv[1].lower() == 'true'
+
     train_data, test_data = load_data()
-    data_loader = DataLoader(ThreeLoader(train_data), batch_size=BATCH_SIZE, shuffle=True)
+    train_loader = DataLoader(ThreeLoader(train_data), batch_size=BATCH_SIZE, shuffle=True)
+    test_loader = DataLoader(ThreeLoader(test_data), batch_size=BATCH_SIZE, shuffle=False)
     model = AutoEncoder().cuda()
     criterion = nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     lambda1 = lambda \
             epoch: lr if epoch < EPOCHS / 2 else lr * 0.1 if epoch < 3 * EPOCHS / 4 else lr * 0.01
     scheduler = LambdaLR(optimizer, [lambda1])
-    losses = [] 
+    test_accuracy = []
+    train_accuracy = []
+    if LOUD:
+        pre_learn_weights = extract_weights(model)
+    losses = []
     for epoch in range(EPOCHS):
-        for data in data_loader:
-            img, _ = data
-            img = img.view(img.size(0), -1)
-            img = Variable(img).cuda()
-            # ===================forward=====================
-            output = model(img)
-            loss = criterion(output, img)
-            # ===================backward====================
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            scheduler.step(epoch)
-            losses.append(float(nn.functional.l1_loss(output, img)))
-            # ===================log========================
-        print('epoch [{}/{}], loss:{:.4f}'.format(epoch + 1, EPOCHS, np.mean(np.array(losses))))
+        train_accuracy.append(train(model, optimizer, criterion, train_loader, scheduler, epoch))
+        test_accuracy.append(test(model, criterion, test_loader, None, False))
+    if LOUD:
+        draw_accuracies(train_accuracy, test_accuracy)
+        post_learn_weights = extract_weights(model)
+        plot()
+        test_accuracy.append(test(model, criterion, test_loader, None, True))
