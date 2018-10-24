@@ -144,6 +144,7 @@ def draw_accuracies(train_acc, test_acc):
 
 
 def plot():
+    plt.cla()
     mn = min(np.min(pre_learn_weights), np.min(post_learn_weights))
     mx = max(np.max(pre_learn_weights), np.max(post_learn_weights))
     plt.hist(pre_learn_weights, label='Pre Training', range=(mn, mx), bins=1000, alpha=0.6)
