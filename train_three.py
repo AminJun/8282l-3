@@ -76,7 +76,7 @@ if __name__ == '__main__':
             img = Variable(img).cuda()
             # ===================forward=====================
             output = model(img)
-            loss = criterion(output, img)
+            loss = criterion(img, output)
             # ===================backward====================
             optimizer.zero_grad()
             loss.backward()
