@@ -1,7 +1,9 @@
 import numpy as np
+import sys
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
@@ -101,7 +103,9 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
-    print('Loss: %.3f | ACC: %.3f' % (train_loss, 100. * correct / total))
+    total_accuracy = float(100. * correct / total)
+    print('Loss: %.3f | ACC: %.3f' % (train_loss, total_accuracy))
+    return total_accuracy
 
 
 def test(my_net, my_criterion, my_loader, my_device):
@@ -118,10 +122,23 @@ def test(my_net, my_criterion, my_loader, my_device):
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
-    print('Loss: %.3f | ACC: %.3f' % (test_loss, 100. * correct / total))
+    total_accuracy = float(100. * correct / total)
+    print('Loss: %.3f | ACC: %.3f' % (test_loss, total_accuracy))
+    return total_accuracy
 
+
+def draw_accuracies(train_acc, test_acc):
+    import pdb
+    pdb.set_trace()
+    plt.plot(train_acc, label='Train Accuracy')
+    plt.plot(test_acc, label='Train Accuracy')
+    plt.legend()
+    plt.savefig(DATA_SET + '_acc_plt.png')
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        LOUD = sys.argv[1].lower() == 'true'
+
     data, mean, std = load_data()
     x_train, x_test, y_train, y_test = data
     train_loader = DataLoader(TrainLoader(x_train, y_train, mean, std), batch_size=BATCH_SIZE,
@@ -140,6 +157,11 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     lr = 0.1
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
+    test_accuracy = []
+    train_accuracy = []
     for _ in range(200):
-        train(net, optimizer, criterion, train_loader, device)
-        test(net, criterion, test_loader, device)
+        train_accuracy.append(train(net, optimizer, criterion, train_loader, device))
+        test_accuracy.append(test(net, criterion, test_loader, device))
+
+    if LOUD:
+        draw_accuracies(train_accuracy, test_accuracy)
