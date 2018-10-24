@@ -1,2 +1,2 @@
 git pull
-python train_adult.py True
+python train_three.py True

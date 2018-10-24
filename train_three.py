@@ -112,6 +112,13 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             img = Variable(img).cuda()
             # ===================forward=====================
             output = my_net(img)
+            if save:
+                for i in range(len(output)):
+                    if float(nn.functional.l1_loss(output[i], img[i])) > 0.001:
+                        import pdb
+                        pdb.set_trace()
+                        print(img[i])
+
             # loss = criterion(output, img)
             # ===================backward====================
             # optimizer.zero_grad()
@@ -120,7 +127,7 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             # scheduler.step(epoch)
             losses.append(float(nn.functional.l1_loss(output, img)))
         curr_accuracy = np.mean(np.array(losses))
-        print('Train: Loss: %.4f' % (curr_accuracy))
+        print('Test: Loss: %.4f' % (curr_accuracy))
         return curr_accuracy
 
 
