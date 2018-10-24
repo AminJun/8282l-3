@@ -125,6 +125,8 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             correct += predicted.eq(targets).sum().item()
             if save:
                 for i in range(len(targets)):
+                    import pdb
+                    pdb.set_trace()
                     if int(targets[i]) != int(outputs[i]):
                         import pdb
                         pdb.set_trace()
