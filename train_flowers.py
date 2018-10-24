@@ -131,7 +131,7 @@ def draw_accuracies(train_acc, test_acc):
     import pdb
     pdb.set_trace()
     plt.plot(train_acc, label='Train Accuracy')
-    plt.plot(test_acc, label='Train Accuracy')
+    plt.plot(test_acc, label='Test Accuracy')
     plt.legend()
     plt.savefig(DATA_SET + '_acc_plt.png')
 
@@ -165,3 +165,5 @@ if __name__ == '__main__':
 
     if LOUD:
         draw_accuracies(train_accuracy, test_accuracy)
+    import pdb
+    pdb.set_trace()
