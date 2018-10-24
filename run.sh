@@ -1,2 +1,2 @@
-git pull 
+git pull
 python train_adult.py
