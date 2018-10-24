@@ -12,7 +12,7 @@ from torch.utils.data import Dataset, DataLoader
 
 LOUD = False
 BATCH_SIZE = 64  # 128  # Must be in range (16, 100)
-EPOCHS = 200
+EPOCHS = 10
 pre_learn_weights = []
 post_learn_weights = []
 DATA_SET = 'Adult'
@@ -23,8 +23,6 @@ def load_data():
     x = np.load(DATA_SET + '/data.npy').astype(np.float32)
     x = MinMaxScaler().fit(x).transform(x)
     y = np.expand_dims(np.load(DATA_SET + '/labels.npy').astype(np.float32), 1)
-    import pdb
-    pdb.set_trace()
     # Uncomment to get ride of the redundant data
     # both = np.concatenate((x, y), axis=1)
     # data = np.unique(both, axis=0)
@@ -166,3 +164,8 @@ if __name__ == '__main__':
         draw_accuracies(train_accuracy, test_accuracy)
         post_learn_weights = extract_weights(net)
         plot()
+
+
+# 45222
+# 39161
+# 38138
