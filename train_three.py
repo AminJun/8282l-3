@@ -44,8 +44,7 @@ class AutoEncoder(nn.Module):
             nn.Linear(_l1, _mid))
         self.decoder = nn.Sequential(
             nn.Linear(_mid, _l1), nn.Tanh(),
-            # nn.Linear(_l3, _l2), nn.ReLU(True),
-            # nn.Linear(_l2, _l1), nn.Tanh(),
+            # nn.Linear(_l3, _l2), nn.ReLU(True), # nn.Linear(_l2, _l1), nn.Tanh(),
             nn.Linear(_l1, _in), nn.Tanh())
 
     def forward(self, x):
@@ -102,7 +101,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_scheduler, c_epoch):
     return curr_accuracy
 
 
-def test(my_net, my_criterion, my_loader, my_device, save=False):
+def test(my_net, my_loader, save=False):
     my_net.eval()
     with torch.no_grad():
         losses = []
@@ -110,7 +109,6 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             img, _ = data
             img = img.view(img.size(0), -1)
             img = Variable(img).cuda()
-            # ===================forward=====================
             output = my_net(img)
             if save:
                 for i in range(len(output)):
@@ -118,13 +116,6 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
                         import pdb
                         pdb.set_trace()
                         print(img[i])
-
-            # loss = criterion(output, img)
-            # ===================backward====================
-            # optimizer.zero_grad()
-            # loss.backward()
-            # optimizer.step()
-            # scheduler.step(epoch)
             losses.append(float(nn.functional.l1_loss(output, img)))
         curr_accuracy = np.mean(np.array(losses))
         print('Test: Loss: %.4f' % (curr_accuracy))
@@ -151,9 +142,14 @@ if __name__ == '__main__':
     losses = []
     for epoch in range(EPOCHS):
         train_accuracy.append(train(model, optimizer, criterion, train_loader, scheduler, epoch))
-        test_accuracy.append(test(model, criterion, test_loader, None, False))
+        test_accuracy.append(test(model, test_loader, False))
     if LOUD:
         draw_accuracies(train_accuracy, test_accuracy)
         post_learn_weights = extract_weights(model)
         plot()
-        test_accuracy.append(test(model, criterion, test_loader, None, True))
+        test_accuracy.append(test(model, test_loader, True))
+
+# [0.0964, 0.6095, 0.7833, 0.4680, 0.7786, 0.6161, 0.3410, 0.3688, 0.4354,
+#         0.4751, 0.4460, 0.6595, 0.4321, 0.5848, 0.5066, 0.5483, 0.5391, 0.4441,
+#         0.3720, 0.3895, 0.2866, 0.3031, 0.5453, 0.8546, 0.7902, 0.3816, 0.3432,
+#         0.7204, 0.4564, 0.2401, 0.4957, 0.5207, 0.5105]
