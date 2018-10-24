@@ -125,9 +125,7 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             correct += predicted.eq(targets).sum().item()
             if save:
                 for i in range(len(targets)):
-                    import pdb
-                    pdb.set_trace()
-                    if int(targets[i]) != int(outputs[i]):
+                    if int(targets[i]) != int(predicted[i]):
                         import pdb
                         pdb.set_trace()
                         plt.imsave(DATA_SET + '_{}.png'.format(targets[i]), inputs[i].squeeze())
