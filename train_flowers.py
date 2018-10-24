@@ -104,7 +104,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device='cpu'):
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
     total_accuracy = float(100. * correct / total)
-    print('Loss: %.3f | ACC: %.3f' % (train_loss, total_accuracy))
+    print('Train Loss: %.3f | ACC: %.3f' % (train_loss, total_accuracy))
     return total_accuracy
 
 
@@ -123,7 +123,7 @@ def test(my_net, my_criterion, my_loader, my_device):
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
     total_accuracy = float(100. * correct / total)
-    print('Loss: %.3f | ACC: %.3f' % (test_loss, total_accuracy))
+    print('Test Loss: %.3f | ACC: %.3f' % (test_loss, total_accuracy))
     return total_accuracy
 
 
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     test_accuracy = []
     train_accuracy = []
-    for _ in range(200):
+    for _ in range(EPOCHS):
         train_accuracy.append(train(net, optimizer, criterion, train_loader, device))
         test_accuracy.append(test(net, criterion, test_loader, device))
 
