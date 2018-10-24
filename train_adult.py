@@ -96,7 +96,7 @@ def train(my_net, my_optimizer, my_criterion, my_loader, my_device):
     return curr_accuracy
 
 
-def test(my_net, my_criterion, my_loader, my_device):
+def test(my_net, my_criterion, my_loader, my_device, save=False):
     my_net.eval()
     test_loss = []
     correct = 0
@@ -111,6 +111,12 @@ def test(my_net, my_criterion, my_loader, my_device):
             my_acc = accuracy(outputs, targets)
             tacc.append(my_acc)
             total += targets.size(0)
+            if save:
+                for i in range(len(targets)):
+                    if abs(targets[i] - outputs[i]) > 0.5:
+                        import pdb
+                        pdb.set_trace()
+                        print(list(inputs[i]))
     curr_accuracy = 100. * np.mean(np.array(tacc))
     print('Test: Loss: %.3f | ACC: %.3f' % (np.mean(np.array(test_loss)), curr_accuracy))
     return curr_accuracy
