@@ -1,9 +1,10 @@
-import numpy as np
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from torch.backends import cudnn
 from torch.utils.data import Dataset, DataLoader
@@ -127,13 +128,29 @@ def test(my_net, my_criterion, my_loader, my_device):
     return total_accuracy
 
 
+def extract_weights(my_net):
+    arr = np.array([])
+    for d in my_net.parameters():
+        arr = np.append(arr, np.array(d).flatten())
+    return arr
+
+
 def draw_accuracies(train_acc, test_acc):
-    import pdb
-    pdb.set_trace()
+    plt.cla()
     plt.plot(train_acc, label='Train Accuracy')
     plt.plot(test_acc, label='Test Accuracy')
     plt.legend()
     plt.savefig(DATA_SET + '_acc_plt.png')
+
+
+def plot():
+    mn = min(np.min(pre_learn_weights), np.min(post_learn_weights))
+    mx = max(np.max(pre_learn_weights), np.max(post_learn_weights))
+    plt.hist(pre_learn_weights, label='Pre Training', range=(mn, mx), bins=1000, alpha=0.6)
+    plt.hist(post_learn_weights, label='Post Training', range=(mn, mx), bins=1000, alpha=0.6)
+    plt.legend()
+    plt.savefig(DATA_SET + '_plt.png')
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -159,11 +176,17 @@ if __name__ == '__main__':
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     test_accuracy = []
     train_accuracy = []
+    if LOUD:
+        pre_learn_weights = extract_weights(net)
     for _ in range(EPOCHS):
         train_accuracy.append(train(net, optimizer, criterion, train_loader, device))
         test_accuracy.append(test(net, criterion, test_loader, device))
 
     if LOUD:
         draw_accuracies(train_accuracy, test_accuracy)
+        post_learn_weights = extract_weights(net)
+        plot()
+
     import pdb
+
     pdb.set_trace()
