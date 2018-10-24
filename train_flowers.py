@@ -1,5 +1,6 @@
 import sys
 
+import matplotlib.image as imgsv
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -127,8 +128,9 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
                 for i in range(len(targets)):
                     if int(targets[i]) != int(predicted[i]):
                         import pdb
+                        new_image = np.rollaxis(np.array(inputs[i]), 0, 3)
                         pdb.set_trace()
-                        plt.imsave(DATA_SET + '_{}.png'.format(targets[i]), inputs[i].squeeze())
+                        imgsv.imsave(DATA_SET + '_{}.png'.format(targets[i]), new_image)
     total_accuracy = float(100. * correct / total)
     print('Test Loss: %.3f | ACC: %.3f' % (test_loss, total_accuracy))
     return total_accuracy
@@ -159,15 +161,15 @@ def plot():
     plt.savefig(DATA_SET + '_plt.png')
 
 
-def mrs_labeled():
-    pred = net(x_test)
-    true_class = y_test.argmax(axis=1)
-    incorrects = np.nonzero(pred != true_class)
-    class_examples = [(incorrects[0][true_class[incorrects] == cls]) for cls in range(10)]
-    for cls_ex in class_examples:
-        if len(cls_ex):
-            plt.imsave(DATA_SET + '_{}.png'.format(true_class[cls_ex[0]]),
-                       x_test[cls_ex[0]].squeeze())
+# def mrs_labeled():
+#     pred = net(x_test)
+#     true_class = y_test.argmax(axis=1)
+#     incorrects = np.nonzero(pred != true_class)
+#     class_examples = [(incorrects[0][true_class[incorrects] == cls]) for cls in range(10)]
+#     for cls_ex in class_examples:
+#         if len(cls_ex):
+#             plt.imsave(DATA_SET + '_{}.png'.format(true_class[cls_ex[0]]),
+#                        x_test[cls_ex[0]].squeeze())
 
 
 if __name__ == '__main__':
