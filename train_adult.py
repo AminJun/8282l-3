@@ -156,6 +156,8 @@ if __name__ == '__main__':
     criterion = nn.BCELoss()
     test_accuracy = []
     train_accuracy = []
+    if LOUD:
+        pre_learn_weights = extract_weights(net)
     for _ in range(EPOCHS):
         train_accuracy.append(train(net, opt, criterion, train_loader, device))
         test_accuracy.append(test(net, criterion, test_loader, device))
