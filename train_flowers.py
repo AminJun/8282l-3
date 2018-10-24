@@ -131,7 +131,7 @@ def test(my_net, my_criterion, my_loader, my_device):
 def extract_weights(my_net):
     arr = np.array([])
     for d in my_net.parameters():
-        arr = np.append(arr, np.array(d).flatten())
+        arr = np.append(arr, np.array(d.data).flatten())
     return arr
 
 
