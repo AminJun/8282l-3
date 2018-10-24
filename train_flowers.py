@@ -126,6 +126,8 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             if save:
                 for i in range(len(targets)):
                     if targets[i] != outputs[i]:
+                        import pdb
+                        pdb.set_trace()
                         plt.imsave(DATA_SET + '_{}.png'.format(targets[i]), inputs[i].squeeze())
     total_accuracy = float(100. * correct / total)
     print('Test Loss: %.3f | ACC: %.3f' % (test_loss, total_accuracy))
