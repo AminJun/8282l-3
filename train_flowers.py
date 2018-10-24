@@ -124,8 +124,9 @@ def test(my_net, my_criterion, my_loader, my_device, save=False):
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
             if save:
-                import pdb
-                pdb.set_trace()
+                for i in range(len(targets)):
+                    if targets[i] != outputs[i]:
+                        plt.imsave(DATA_SET + '_{}.png'.format(targets[i]), inputs[i].squeeze())
     total_accuracy = float(100. * correct / total)
     print('Test Loss: %.3f | ACC: %.3f' % (test_loss, total_accuracy))
     return total_accuracy
@@ -154,6 +155,7 @@ def plot():
     plt.hist(post_learn_weights, label='Post Training', range=(-0.5, 0.5), bins=1000, alpha=0.6)
     plt.legend()
     plt.savefig(DATA_SET + '_plt.png')
+
 
 def mrs_labeled():
     pred = net(x_test)
